@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"
+      integrity="sha512-NLtnLBS9Q2w7GKK9rKxdtgL7rA7CAS85uC/0xd9im4J/yOL4F9ZVlv634NAM7run8hz3wI2GabaA6vv8vJtHiQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="http://www.yanhuangxueyuan.com/threejs/examples/js/controls/OrbitControls.js"></script>
+    <script src="./lib/OBJLoader.js"></script>
+    <script src="./lib/MTLLoader.js"></script>
+    <script src="./lib/inflate.min.js"></script>
+    <script src="./lib/FBXLoader.js"></script>
+    <script src="./lib/stats.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"
+      integrity="sha512-gmwBmiTVER57N3jYS3LinA9eb8aHrJua5iQD7yqYCKa5x6Jjc7VDVaEA0je0Lu0bP9j7tEjV3+1qUm6loO99Kw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body></body>
+
+  <script src="./index.js"></script>
+  <script type="x-shader/x-fragment" id="fragmentshader">
+        // 片元着色器
+    precision highp float;
+
+    void main() {
+        float len = length(gl_PointCoord.xy - .5) * 2.0;
+        float radialAlpha = pow(clamp(1.0 - len, 0.0, 1.0), 3.4);
+
+        float alpha = radialAlpha;
+
+        gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+    }
+    // 顶点着色器
+    attribute float a_size;
+
+    void main() {
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        gl_PointSize = 4. * ( 300.0 / -mvPosition.z );
+        gl_Position = projectionMatrix * mvPosition;
+    }
+  </script>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body></body>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"
+    integrity="sha512-NLtnLBS9Q2w7GKK9rKxdtgL7rA7CAS85uC/0xd9im4J/yOL4F9ZVlv634NAM7run8hz3wI2GabaA6vv8vJtHiQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="http://www.yanhuangxueyuan.com/threejs/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    /**
+     * 创建场景对象Scene
+     */
+    var scene = new THREE.Scene()
+    /**
+     * 创建球体模型
+     */
+    // let geometry = new THREE.SphereGeometry(40, 30, 30)
+    // let geometry = new THREE.BoxGeometry(100, 100)
+    // geometry
+    const geometry = new THREE.BufferGeometry()
+    const count = 50000
+    const positions = new Float32Array(count * 3) // 每个点由三个坐标值组成（x, y, z）
+    for (let i = 0; i < count * 3; i += 1) {
+      positions[i] = (Math.random() - 0.5) * 5
+    }
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+    // 3D字体
+    // const loader = new THREE.FontLoader()
+    // loader.load('./fonts/helvetiker_regular.typeface.json', function (font) {
+    //   geometry = new THREE.TextGeometry('zhihaot1', {
+    //     font: font,
+    //     size: 80,
+    //     height: 1,
+    //     curveSegments: 12,
+    //     bevelEnabled: true,
+    //     bevelThickness: 10,
+    //     bevelSize: 8,
+    //     bevelSegments: 5
+    //   })
+    //   let particleSystem = new THREE.Points(geometry, pMaterial)
+    //   // 加入场景
+    //   // scene.add(new THREE.Mesh(geometry, pMaterial))
+    //   scene.add(particleSystem)
+    // })
+    // 粒子材料
+    let pMaterial = new THREE.PointsMaterial({
+      // 粒子颜色
+      color: 0xffffff,
+      // 粒子大小
+      size: 2
+    })
+    // 粒子系统
+    let particleSystem = new THREE.Points(geometry, pMaterial)
+    // 加入场景
+    scene.add(particleSystem)
+    /**
+     * 光源设置
+     */
+    //点光源
+    var point = new THREE.PointLight(0xffffff)
+    point.position.set(400, 200, 300) //点光源位置
+    scene.add(point) //点光源添加到场景中
+    //环境光
+    var ambient = new THREE.AmbientLight(0x444444)
+    scene.add(ambient)
+    // console.log(scene)
+    // console.log(scene.children)
+    /**
+     * 相机设置
+     */
+    var width = window.innerWidth //窗口宽度
+    var height = window.innerHeight //窗口高度
+    var k = width / height //窗口宽高比
+    var s = 5 //三维场景显示范围控制系数，系数越大，显示的范围越大
+    //创建相机对象
+    var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000)
+    camera.position.set(0, 0, 300) //设置相机位置
+    camera.lookAt(scene.position) //设置相机方向(指向的场景对象)
+    /**
+     * 创建渲染器对象
+     */
+    var renderer = new THREE.WebGLRenderer()
+    renderer.setSize(width, height) //设置渲染区域尺寸
+    renderer.setClearColor(0x000000, 1) //设置背景颜色
+    document.body.appendChild(renderer.domElement) //body元素中插入canvas对象
+
+    // 渲染函数
+    function render() {
+      renderer.render(scene, camera) //执行渲染操作
+      // mesh.rotateY(0.01) //每次绕y轴旋转0.01弧度
+      requestAnimationFrame(render) //请求再次执行渲染函数render
+    }
+    render()
+    var controls = new THREE.OrbitControls(camera, renderer.domElement) //创建控件对象
+    // controls.addEventListener('change', render) //监听鼠标、键盘事件
+  </script>
+  <!-- shader代码 顶点着色器代码 -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+    void main() {
+        gl_PointSize = 4.;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  </script>
+  <!-- 片元着色器代码 -->
+  <script type="x-shader/x-fragment" id="fragmentshader">
+    uniform vec3 color;
+    void main() {
+        gl_FragColor = vec4(color, 1.0);
+    }
+  </script>
+</html>

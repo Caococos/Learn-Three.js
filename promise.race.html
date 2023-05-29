@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      webview {
+        display: block;
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <webview id="foo" src="https://www.github.com/" style="display: inline-flex; width: 640px; height: 480px"></webview>
+  </body>
+  <script>
+    //请求某个图片资源
+    function requestImg() {
+      var p = new Promise(function (resolve, reject) {
+        var img = new Image()
+        img.onload = function () {
+          resolve(img)
+        }
+        img.src =
+          'https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-assets/v3/static/img/logo.a7995ad.svg~tplv-t2oaga2asx-image.image' //正确的
+        // img.src = 'https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-assets/v3/static/img/logo.a7995ad.svg1~tplv-t2oaga2asx-image.image'
+      })
+      return p
+    }
+
+    //延时函数，用于给请求计时
+    function timeout() {
+      var p = new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          reject('图片请求超时')
+        }, 5000)
+      })
+      return p
+    }
+
+    Promise.race([requestImg(), timeout()])
+      .then(function (results) {
+        console.log(results)
+      })
+      .catch(function (reason) {
+        console.log(reason)
+      })
+  </script>
+</html>

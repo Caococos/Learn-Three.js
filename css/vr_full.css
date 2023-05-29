@@ -1,0 +1,146 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+* {
+  box-sizing: border-box;
+}
+#main {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+/* vr全景内容样式 */
+#panoramaConianer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.btn_prv img,
+.btn_next img {
+  width: 100%;
+}
+.btn_prv,
+.btn_next {
+  display: block;
+  padding: 10px 0;
+  width: 30px;
+  height: 50px;
+  position: absolute;
+  cursor: pointer;
+}
+.btn_prv {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.btn_next {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.btn_prv:hover,
+.btn_next:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+/* 导航栏样式 */
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 18px;
+  height: 44px;
+  width: 100%;
+  background-color: #000;
+  z-index: 10;
+}
+#toggler {
+  display: none;
+}
+.hamburger-container {
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  top: 16px;
+}
+.hamburger-container span {
+  position: relative;
+  display: block;
+  height: 1px;
+  background-color: #fff;
+  transition: transform 0.3s ease-in-out, top 0.3s ease-in-out 0.3s;
+  top: 0; /*预设值 */
+}
+.hamburger-container span:nth-child(2) {
+  margin-top: 7px;
+}
+#toggler:checked + label .hamburger-container span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 4px;
+  transition: top 0.3s ease-in-out, transform 0.3s ease-in-out 0.3s;
+}
+#toggler:checked + label .hamburger-container span:nth-child(2) {
+  transform: rotate(-45deg);
+  top: -4px;
+  transition: top 0.3s ease-in-out, transform 0.3s ease-in-out 0.3s;
+}
+.nav-items {
+  background-color: rgba(0, 0, 0, 0.82);
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 44px;
+  left: 0;
+  color: #fff;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 0.3s ease-in-out 0.3s, opacity 0.3s ease-in-out 0.3s;
+}
+#toggler:checked ~ .nav-items {
+  transform: scaleY(1);
+  opacity: 1;
+}
+ul {
+  padding: 0;
+  margin: 0;
+}
+li {
+  padding: 1rem 40px;
+  list-style: none;
+  cursor: pointer;
+}
+li:hover {
+  background-color: rgba(221, 127, 127, 0.5);
+}
+li[data-hover='true'] {
+  background-color: rgba(221, 127, 127, 0.5);
+}
+.page1 {
+  width: 100%;
+  height: 100%;
+  background: url(../img/eris.png) no-repeat;
+  background-size: 100% auto;
+}
+/* 过渡样式 */
+.transitions {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  /* background-color: rgba(7, 17, 27, 0.5); */
+  /* backdrop-filter: blur(10px); */
+  background: url(../img/bochita.jpg) no-repeat;
+  background-size: cover;
+  filter: blur(10px);
+}
+
+@media screen and (min-width: 470px) {
+  .btn_prv,
+  .btn_next {
+    width: 50px;
+    height: 70px;
+  }
+}

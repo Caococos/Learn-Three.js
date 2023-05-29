@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body></body>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"
+    integrity="sha512-NLtnLBS9Q2w7GKK9rKxdtgL7rA7CAS85uC/0xd9im4J/yOL4F9ZVlv634NAM7run8hz3wI2GabaA6vv8vJtHiQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="http://www.yanhuangxueyuan.com/threejs/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    /**
+     * 创建场景对象Scene
+     */
+    var scene = new THREE.Scene()
+    /**
+     * 创建球体模型
+     */
+    // let geometry = new THREE.SphereGeometry(40, 30, 30)
+    // let geometry = new THREE.BoxGeometry(100, 100)
+    // geometry
+    // 单行文字
+    // 获得文字像素值
+    function getTextInfo(text) {
+      var canvas = document.createElement('canvas')
+      var ctx = canvas.getContext('2d')
+      ctx.font = '32px adobe-text-pro'
+      var width = (canvas.width = Math.ceil(ctx.measureText(text).width))
+      canvas.height = 32
+      ctx.font = '32px adobe-text-pro'
+      // 将文字绘制到canvas上
+      ctx.fillText(text, 0, (32 * 3) / 4)
+
+      var x, y
+      var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      var xyas = []
+      for (var i = 0, len = data.length / 4; i < len; i++) {
+        if (data[i * 4 + 3] > 0) {
+          xyas.push(
+            i % width, // x位置
+            (i / width) | 0, // y位置
+            data[i * 4 + 3] / 255 // alpha (glsl是0-1 所以／255)
+          )
+        }
+      }
+      return {
+        width: width, // 文字宽度
+        amount: xyas.length / 3, // particles数量.
+        xyas: xyas // 位置数据
+      }
+    }
+
+    var _textXY = getTextInfo('1')
+
+    var pointGeometry = new THREE.BufferGeometry()
+    var amount = 100
+    var positionData = new Float32Array(amount * 3)
+    var randomData = new Float32Array(amount * 3)
+    var textXY, x, y, a, i, j, offset
+
+    for (j = 0; j < amount; j++) {
+      textXY = _textXY.xyas
+      offset = j * 3
+      x = textXY[j * 3 + 0]
+      y = textXY[j * 3 + 1]
+      a = textXY[j * 3 + 2]
+
+      var radius = 30 + Math.floor(j / 360.0) / 200
+      positionData[offset + 0] = x - _textXY.width / 2
+      positionData[offset + 1] = -(y - 32)
+      positionData[offset + 2] = 0
+
+      randomData[offset] = Math.random()
+    }
+
+    pointGeometry.addAttribute('a_random', new THREE.BufferAttribute(randomData, 1)) //用于动画
+    pointGeometry.addAttribute('position', new THREE.BufferAttribute(positionData, 3)) // particles位置
+    // 获得文字像素值
+    function getTextInfo(text) {
+      var canvas = document.createElement('canvas')
+      var ctx = canvas.getContext('2d')
+      ctx.font = '32px adobe-text-pro'
+      var width = (canvas.width = Math.ceil(ctx.measureText(text).width))
+      canvas.height = 32
+      ctx.font = '32px adobe-text-pro'
+      // 将文字绘制到canvas上
+      ctx.fillText(text, 0, (32 * 3) / 4)
+
+      var x, y
+      var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      var xyas = []
+      for (var i = 0, len = data.length / 4; i < len; i++) {
+        if (data[i * 4 + 3] > 0) {
+          xyas.push(
+            i % width, // x位置
+            (i / width) | 0, // y位置
+            data[i * 4 + 3] / 255 // alpha (glsl是0-1 所以／255)
+          )
+        }
+      }
+      return {
+        width: width, // 文字宽度
+        amount: xyas.length / 3, // particles数量
+        xyas: xyas // 位置数据
+      }
+    }
+
+    getTextInfo('填写绘制的文字')
+
+    var pMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      // size: 20,
+      blending: THREE.AdditiveBlending,
+      transparent: true
+    })
+
+    var points = new THREE.Points(pointGeometry, pMaterial)
+
+    scene.add(points) // 添加至场景
+
+    /**
+     * 光源设置
+     */
+    //点光源
+    var point = new THREE.PointLight(0xffffff)
+    point.position.set(400, 200, 300) //点光源位置
+    scene.add(point) //点光源添加到场景中
+    //环境光
+    var ambient = new THREE.AmbientLight(0x444444)
+    scene.add(ambient)
+    // console.log(scene)
+    // console.log(scene.children)
+    /**
+     * 相机设置
+     */
+    var width = window.innerWidth //窗口宽度
+    var height = window.innerHeight //窗口高度
+    var k = width / height //窗口宽高比
+    var s = 5 //三维场景显示范围控制系数，系数越大，显示的范围越大
+    //创建相机对象
+    var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000)
+    camera.position.set(0, 0, 300) //设置相机位置
+    camera.lookAt(scene.position) //设置相机方向(指向的场景对象)
+    /**
+     * 创建渲染器对象
+     */
+    var renderer = new THREE.WebGLRenderer()
+    renderer.setSize(width, height) //设置渲染区域尺寸
+    renderer.setClearColor(0x000000, 1) //设置背景颜色
+    document.body.appendChild(renderer.domElement) //body元素中插入canvas对象
+
+    // 渲染函数
+    function render() {
+      renderer.render(scene, camera) //执行渲染操作
+      // mesh.rotateY(0.01) //每次绕y轴旋转0.01弧度
+      requestAnimationFrame(render) //请求再次执行渲染函数render
+    }
+    render()
+    var controls = new THREE.OrbitControls(camera, renderer.domElement) //创建控件对象
+    // controls.addEventListener('change', render) //监听鼠标、键盘事件
+  </script>
+  <!-- shader代码 顶点着色器代码 -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+        // 片元着色器
+    precision highp float;
+
+    void main() {
+        float len = length(gl_PointCoord.xy - .5) * 2.0;
+        float radialAlpha = pow(clamp(1.0 - len, 0.0, 1.0), 3.4);
+
+        float alpha = radialAlpha;
+
+        gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+    }
+    // 顶点着色器
+    attribute float a_size;
+
+    void main() {
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        gl_PointSize = 4. * ( 300.0 / -mvPosition.z );
+        gl_Position = projectionMatrix * mvPosition;
+    }
+  </script>
+</html>

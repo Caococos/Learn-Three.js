@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vr全景展览</title>
+    <link rel="stylesheet" href="./css/vr_full.css" />
+  </head>
+  <body style="display: none">
+    <div id="main">
+      <header>
+        <input type="checkbox" id="toggler" />
+        <label for="toggler">
+          <div class="hamburger-container">
+            <span></span>
+            <span></span>
+          </div>
+        </label>
+
+        <div class="nav-items">
+          <ul>
+            <li v-for="item in tabList" @click="tabClick(item.index)" :data-hover="tabIndex === item.index">
+              {{item.name}}
+            </li>
+          </ul>
+        </div>
+      </header>
+      <div id="panoramaConianer" v-show="pageIndex === 0">
+        <span class="btn_prv" @click="prvClick()" @touchend="prvClick">
+          <img src="./img/btn_prv.png" alt="" />
+        </span>
+        <span class="btn_next" @click="nextClick()" @touchend="prvClick">
+          <img src="./img/btn_next.png" alt="" />
+        </span>
+      </div>
+      <div class="page1" v-show="pageIndex === 1"></div>
+      <div class="transitions" v-show="isShowTransition"></div>
+    </div>
+  </body>
+  <script src="./lib/vue.min.js"></script>
+  <script src="./lib/three.js"></script>
+  <script src="./lib/tpanorama.js"></script>
+  <script src="./lib/OrbitControls.js"></script>
+  <script src="./js/vr_full.js"></script>
+</html>

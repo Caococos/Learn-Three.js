@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>李狗刷课代码 v1</title>
+  </head>
+  <body></body>
+  <script>
+    'review'
+    let speed = 2 //播放倍率
+    let start_time = 0
+    function auto_jump() {
+      let video = document.getElementsByTagName('video')[0]
+      video.onpause = function () {
+        let jump = setInterval(function () {
+          let con = document.querySelector('.u-btn.u-btn-default.cont.j-continue')
+          if (con) {
+            con.click()
+            clearInterval(jump)
+          }
+        }, 100)
+      }
+    }
+    function FullScreen() {
+      //全屏播放
+      var ele = document.getElementsByTagName('video')[0]
+      if (ele.requestFullscreen) {
+        ele.requestFullscreen()
+      } else if (ele.mozRequestFullScreen) {
+        ele.mozRequestFullScreen()
+      } else if (ele.webkitRequestFullScreen) {
+        ele.webkitRequestFullScreen()
+      }
+    }
+    function show(i) {
+      document.querySelector('#speedText').value = String(i.toFixed(1))
+      GM_setValue('speed', i)
+    }
+    let main = () => {
+      console.log('runmian')
+      if (/content/.test(window.location.href)) {
+        console.log('kaka_mooc_loaded')
+        document.body.onkeydown = function (event) {
+          //恢复按键屏蔽
+          if (window.event) {
+            return event
+          }
+        }
+      }
+    }
+  </script>
+</html>

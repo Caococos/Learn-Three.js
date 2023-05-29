@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vr全景坐标标记</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #panoramaConianer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="panoramaConianer"></div>
+  </body>
+  <script src="./lib/three.js"></script>
+  <script src="./lib/tpanorama.js"></script>
+  <script src="./lib/OrbitControls.js"></script>
+  <script>
+    var opt, s
+    window.onload = function () {
+      opt = {
+        container: 'panoramaConianer', //setting容器
+        imgUrl: 'img/p6.jpg',
+        width: '1800px', //指定宽度，高度自适应
+        showGrid: true, //是否显示格网
+        showPosition: true, //是否显示经纬度提示
+        lableColor: '#9400D3', //标记颜色
+        gridColor: '#48D1CC', //格网颜色
+        lables: [
+          { lon: -177, lat: -42.8, text: 'ME' },
+          { lon: -179, lat: -13.4, text: '技安' },
+          { lon: 124.2, lat: -3, text: '基佬小组' }
+        ], //标记   {lon:114,lat:38,text:'标记一'}
+        addLable: true, //开启后双击添加标记  (必须开启经纬度提示)
+        getLable: true, //开启后右键查询标记  (必须开启经纬度提示)
+        deleteLbale: true //开启后中键删除(必须开启经纬度提示)
+      }
+      s = new tpanoramaSetting(opt)
+      s.init()
+    }
+  </script>
+</html>
