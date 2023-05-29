@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>几何体</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      #container canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+  </body>
+  <script src="./lib/three.min.js"></script>
+  <script>
+    const container = document.querySelector('#container')
+    const width = window.innerWidth
+    const height = window.innerHeight
+    // 场景
+    const scene = new THREE.Scene()
+
+    // 创建渲染器
+    const renderer = new THREE.WebGLRenderer()
+    const canvas = renderer.domElement
+    container.appendChild(canvas)
+    // 创建相机
+    let aspectRatio = width / height
+    let fieldOfView = 60
+    let nearPlane = 1
+    let farPlane = 10000
+    const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane)
+    // const camera = new THREE.OrthographicCamera(-200, 200, 200, -200, 1, 1000)
+
+    // 创建几何体
+    // const geometry = new THREE.BoxBufferGeometry(1, 1, 1)  //矩形 width height depth
+    // const geometry = new THREE.CircleBufferGeometry(5, 30)  //平面圆 radius segments
+    // const geometry = new THREE.ConeBufferGeometry(5, 20, 32)  //圆锥radius height radialSegments
+    // const geometry = new THREE.CylinderBufferGeometry(5, 5, 20, 32) //圆柱radiusTop radiusBottom height radialSegments
+    // const geometry = new THREE.DodecahedronBufferGeometry(10, 0) //十二面体 radius detail
+    // const geometry = new THREE.IcosahedronBufferGeometry(10, 0) //二十面体 radius detail
+    // const points = []
+    // for (let i = 0; i < 10; i++) {
+    //   points.push(new THREE.Vector2(Math.sin(i * 0.2) * 10 + 5, (i - 5) * 2))
+    // }
+    // const geometry = new THREE.LatheBufferGeometry(points) //二十面体 points  segments
+    const geometry = new THREE.OctahedronBufferGeometry(10, 0) //八面体面体 radius detail
+    // const geometry = new THREE.PlaneGeometry(50, 50) //2D平面矩形 width height
+
+    //创建材质
+    //我们需要让立方体能够反射光，所以不使用MeshBasicMaterial，而是改用MeshPhongMaterial
+    const material = new THREE.MeshPhongMaterial({ color: 0x44aa88 })
+
+    //创建网格
+    const cube = new THREE.Mesh(geometry, material)
+    cube.position.x = 0
+    scene.add(cube)
+
+    //创建光源
+    //户外光
+    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9)
+    scene.add(hemisphereLight)
+
+    // 环境光源
+    const ambientLight = new THREE.AmbientLight(0xdc8874, 0.2)
+    scene.add(ambientLight)
+    // 方向光
+    const light1 = new THREE.DirectionalLight(0xffffff, 1)
+    light1.position.set(50, 50, 50)
+    scene.add(light1) //将光源添加到场景中，若场景中没有任何光源，则可反光材质的物体渲染出的结果是一片漆黑，什么也看不见
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 1)
+    light2.position.set(-50, -50, -50)
+    scene.add(light2)
+
+    //设置透视镜头的Z轴距离，以便我们以某个距离来观察几何体
+    //之前初始化透视镜头时，设置的近平面为 1，远平面为 10000
+    //因此 camera.position.z 的值一定要在 1-10000 的范围内，超出这个范围则画面不会被渲染
+    camera.position.z = 100
+
+    //渲染器根据场景、透视镜头来渲染画面，并将该画面内容填充到 DOM 的 canvas 元素中
+    const render = (time) => {
+      time = time * 0.0003 //原本 time 为毫秒，我们这里对 time 进行转化，修改成 秒，以便于我们动画旋转角度的递增
+      cube.rotation.x = time
+      cube.rotation.y = time
+      // camera.lookAt(this.scene.position)
+      renderer.render(scene, camera)
+      window.requestAnimationFrame(render)
+    }
+    window.requestAnimationFrame(render)
+    // 监听窗口尺寸的改变，重新修改渲染器
+    function handlerResize() {
+      camera.aspect = canvas.clientWidth / canvas.clientHeight //设置镜头宽高比
+      camera.updateProjectionMatrix() //通知镜头更新视野
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
+    }
+    handlerResize()
+    // window.addEventListener('resize', handlerResize)
+    //改为使用ResizeObserver来监控尺寸变化
+    // ResizeObserver用来监听对象的尺寸变化
+    const resizeObserver = new ResizeObserver(handlerResize, { box: 'border-box' })
+    resizeObserver.observe(canvas)
+  </script>
+</html>

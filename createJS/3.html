@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+    <title>手绘笑脸</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="700px" height="500px"></canvas>
+  </body>
+  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+  <script>
+    function drawSmiley(x, y) {
+      // 创建一个形状对象
+      var s = new createjs.Shape()
+      // 获取形状中的图形对象graphics
+      var g = s.graphics
+
+      // 绘制头部，笔触大小为10
+      g.setStrokeStyle(10, 'round', 'round')
+      // 笔触的颜色为黑色（#000）
+      g.beginStroke('#000')
+      g.beginFill('#FC0')
+      g.drawCircle(x, y, 100) //55,53
+
+      //Mouth
+      g.beginFill() // no fill
+      g.arc(x, y, 60, 0, Math.PI)
+
+      //Right eye
+      g.beginStroke() // no stroke
+      g.beginFill('#000')
+      g.drawCircle(x - 30, y - 30, 15)
+
+      //Left eye
+      g.drawCircle(x + 30, y - 30, 15)
+
+      return s
+    }
+    const canvas = document.querySelector('#canvas')
+    const stage = new createjs.Stage(canvas)
+    stage.addChild(drawSmiley(150, 150))
+    stage.update()
+  </script>
+</html>

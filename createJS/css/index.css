@@ -1,0 +1,77 @@
+body {
+  margin: 0;
+}
+h1,
+p {
+  text-align: center;
+}
+.controll {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.btn-move {
+  position: absolute;
+  left: 0;
+  bottom: -100px;
+  display: flex;
+}
+.left {
+  margin: 0 40px;
+  width: 70px;
+  height: 70px;
+  border: 1px solid #262626;
+  border-radius: 50px;
+  background: url('../img/move_left.png') no-repeat;
+  background-size: cover;
+}
+.right {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #262626;
+  border-radius: 50px;
+  background: url('../img/move_right.png') no-repeat;
+  background-size: cover;
+}
+.btn-operation {
+  position: absolute;
+  right: 0;
+  bottom: -100px;
+  display: flex;
+  justify-content: flex-end;
+}
+.attack {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #262626;
+  border-radius: 50px;
+  background: url('../img/attack.png') no-repeat;
+  background-size: cover;
+}
+.jump {
+  margin: 0 40px;
+  width: 70px;
+  height: 70px;
+  border: 1px solid #262626;
+  border-radius: 50px;
+  background: url('../img/jump.png') no-repeat;
+  background-size: cover;
+}
+.jump:active {
+  background-color: #65e8fc;
+}
+.attack:active {
+  background-color: #65e8fc;
+}
+.left:active {
+  background-color: #65e8fc;
+}
+.right:active {
+  background-color: #65e8fc;
+}

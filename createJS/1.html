@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="testCanvas" width="960" height="400"></canvas>
+  </body>
+  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+  <script>
+    let canvas, stage
+    function init() {
+      // 获取canvas的引用:
+      canvas = document.getElementById('testCanvas')
+
+      // 创建一个显示的舞台
+      stage = new createjs.Stage(canvas)
+
+      // 创建一个文字对象:
+      var text = new createjs.Text('Hello World!', '36px Arial', '#777')
+      text.textAlign = 'center'
+
+      // 将文本添加到舞台.
+      stage.addChild(text)
+
+      // 设置位置
+      text.x = canvas.width / 2
+      text.y = 180
+
+      // 渲染更新舞台中的内容
+      stage.update()
+    }
+    init()
+  </script>
+</html>

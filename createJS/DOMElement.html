@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>create.js操作DOM</title>
+    <style>
+      #div {
+        background-color: aqua;
+        width: 200px;
+        height: 200px;
+      }
+      #btn {
+        width: 100px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="div">
+      <button id="btn" onclick="alert('hello')">按钮</button>
+    </div>
+    <canvas id="gameView" width="960px" height="400px"></canvas>
+  </body>
+  <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+  <script src="./js/DOMElement.js"></script>
+</html>

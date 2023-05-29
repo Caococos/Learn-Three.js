@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How to use Sprite</title>
+    <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+    <script src="https://code.createjs.com/1.0.0/tweenjs.min.js"></script>
+    <script src="https://code.createjs.com/1.0.0/preloadjs.min.js"></script>
+  </head>
+  <body>
+    <canvas id="canvas" width="960" height="400"></canvas>
+  </body>
+  <script>
+    const images = [
+      {
+        id: '0',
+        src: './img/arrow1.png'
+      },
+      { id: '1', src: './img/arrow2.png' },
+      { id: '2', src: './img/arrow3.png' },
+      { id: '3', src: './img/arrow4.png' },
+      { id: '4', src: './img/arrow5.png' }
+    ]
+    let img
+    const load = new createjs.LoadQueue(false)
+    load.loadManifest(images)
+    load.on('complete', (_) => {
+      img = [load.getResult(0), load.getResult(1), load.getResult(2), load.getResult(3), load.getResult(4)]
+      console.log(img)
+    })
+
+    const stage = new createjs.Stage('canvas')
+    const arrowSheet = new createjs.SpriteSheet({
+      images: ['./img/Arrow.png'],
+      animations: {
+        shoot: [0, 4, 2]
+      },
+      frames: {
+        count: 5,
+        width: 232,
+        height: 171
+      }
+    })
+    arrowSheet.on('complete', (e) => console.log('Completer ===>', e))
+    arrowSheet.on('error', (e) => console.log('Error ===>', e))
+    const arrow = new createjs.Sprite(arrowSheet, 'shoot')
+    arrow.name = 'arrow'
+    arrow.x = stage.canvas.width / 2
+    arrow.y = 22
+    stage.addChild(arrow)
+    createjs.Ticker.timingMode = createjs.Ticker.RAF
+    createjs.Ticker.addEventListener('tick', stage)
+  </script>
+</html>
