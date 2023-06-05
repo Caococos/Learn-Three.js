@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>正交相机</title>
+  </head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    #container canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <body>
+    <div id="container"></div>
+  </body>
+  <script src="./lib/three.min.js"></script>
+  <script src="./lib/OrbitControls.js"></script>
+  <script>
+    const container = document.querySelector('#container')
+    const width = window.innerWidth
+    const height = window.innerHeight
+    // 场景
+    const scene = new THREE.Scene()
+    // 渲染器
+    const renderer = new THREE.WebGLRenderer()
+    const canvas = renderer.domElement
+    container.appendChild(canvas)
+    // 正交相机创建
+    // 参数: 视椎体左侧面 / 右 / 上 / 下 /近 / 远
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 5, 50)
+    camera.zoom = 0.1
+    camera.position.set(0, 10, 40)
+    // 控制镜头
+    const orbitControls = new THREE.OrbitControls(camera)
+    orbitControls.target.set(0, 0, 0)
+    orbitControls.update()
+    // 几何体
+    const geometry = new THREE.BoxBufferGeometry(10, 10, 10)
+    // 贴图
+    const textureLoader = new THREE.TextureLoader()
+    textureLoader.crossOrigin = ''
+    const map = textureLoader.load('./img/1.png')
+    // 材质
+    const mate = new THREE.MeshBasicMaterial({ map })
+    // 网格
+    const cube = new THREE.Mesh(geometry, mate)
+    cube.position.x = 0
+    scene.add(cube)
+
+    const render = () => {
+      renderer.render(scene, camera)
+      window.requestAnimationFrame(render)
+    }
+    window.requestAnimationFrame(render)
+    // 监听窗口尺寸的改变，重新修改渲染器
+    function handlerResize() {
+      camera.aspect = canvas.clientWidth / canvas.clientHeight //设置镜头宽高比
+      camera.updateProjectionMatrix() //通知镜头更新视野
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
+    }
+    handlerResize()
+    const resizeObserver = new ResizeObserver(handlerResize, { box: 'border-box' })
+    resizeObserver.observe(canvas)
+  </script>
+</html>

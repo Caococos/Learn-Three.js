@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>光源探索</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      #container canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .split {
+        position: fixed;
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .split div {
+        width: inherit;
+        height: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="full-screen">
+      <div class="split">
+        <div id="leftViewRef"></div>
+        <div id="rightViewRef"></div>
+      </div>
+      <div id="container"></div>
+    </div>
+  </body>
+  <script src="./lib/three.min.js"></script>
+  <!-- <script src="./lib/RectAreaLightUniformsLib.js"></script> -->
+  <script src="./lib/OrbitControls.js"></script>
+  <script>
+    const container = document.querySelector('#container')
+    const width = window.innerWidth
+    const height = window.innerHeight
+
+    const leftViewRef = document.querySelector('#leftViewRef')
+    const rightViewRef = document.querySelector('#rightViewRef')
+    // 场景
+    const scene = new THREE.Scene()
+    // 设置颜色
+    scene.background = new THREE.Color(0x000000)
+
+    // 创建渲染器
+    const renderer = new THREE.WebGLRenderer()
+    // 启动裁剪
+    renderer.setScissorTest(true)
+    const canvas = renderer.domElement
+    container.appendChild(canvas)
+
+    // 创建相机left
+    const leftCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 5, 50)
+    leftCamera.zoom = 0.2
+    leftCamera.position.set(0, 10, 20)
+
+    const rightCamera = new THREE.PerspectiveCamera(60, 2, 0.1, 200)
+    rightCamera.position.set(40, 10, 80)
+    rightCamera.lookAt(0, 5, 0)
+
+    const leftControls = new THREE.OrbitControls(leftCamera, leftViewRef)
+    leftControls.target.set(0, 5, 0)
+    leftControls.update()
+
+    // 创建相机right
+    const rightControls = new THREE.OrbitControls(rightCamera, rightViewRef)
+    rightControls.target.set(0, 5, 0)
+    rightControls.update()
+
+    const helper = new THREE.CameraHelper(leftCamera)
+    scene.add(helper)
+
+    // 创建几何体 图元
+    const geometry = new THREE.BoxBufferGeometry(10, 10, 10) //矩形 width height depth
+
+    const loadingManager = new THREE.LoadingManager()
+    const textureLoader = new THREE.TextureLoader(loadingManager)
+    textureLoader.crossOrigin = ''
+    const map = textureLoader.load('./img/1.png')
+    //创建材质
+    //我们需要让立方体能够反射光，所以不使用MeshBasicMaterial，而是改用MeshPhongMaterial
+
+    // 创建所有纹理加载的管理器
+    const materialArr = []
+    for (let i = 1; i < 7; i++) {
+      const texture = textureLoader.load(`./img/${i}.png`)
+      // const texture = textureLoader.load(`./img/black_white.jpg`)
+      // texture.minFilter = THREE.NearestFilter //缩放模式 ===> 最接近模式
+      // texture.wrapS = THREE.RepeatWrapping
+      // texture.wrapT = THREE.RepeatWrapping
+      // texture.repeat.set(80, 80)
+      const mate = new THREE.MeshPhysicalMaterial({
+        map: texture
+      })
+      // console.log((texture.minFilter = THREE.NearestFilter))
+      materialArr.push(mate)
+    }
+    loadingManager.onLoad = () => {
+      console.log('图片加载完成')
+    }
+    loadingManager.onProgress = (url, loaded, total) => {
+      console.log(`图片加载中，共${total}张，当前已加载${loaded}张 ${url}`)
+    }
+    loadingManager.onError = (url) => {
+      console.log(`加载失败 ${url}`)
+    }
+    // const material = new THREE.MeshPhongMaterial({ mapArr })
+
+    //创建网格
+    const cube = new THREE.Mesh(geometry, materialArr)
+    cube.position.x = 0
+    scene.add(cube)
+
+    //创建光源
+    //户外光
+    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9) //天空光线颜色、地面反射光颜色、光的反射强度
+    scene.add(hemisphereLight)
+
+    // // 环境光源
+    const ambientLight = new THREE.AmbientLight(0xdc8874, 0.2) //光线颜色、强度
+    scene.add(ambientLight)
+    // 方向光
+    const light1 = new THREE.DirectionalLight(0xffffff, 1)
+    light1.position.set(50, 50, 50)
+    light1.target.position.set(-5, 0, 0)
+    scene.add(light1) //将光源添加到场景中，若场景中没有任何光源，则可反光材质的物体渲染出的结果是一片漆黑，什么也看不见
+
+    // 根据平行光实例，创建对应的辅助对象，并将辅助对象添加到场景中
+    // const light1Helper = new THREE.DirectionalLightHelper(light1)
+    // scene.add(light1Helper)
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 1)
+    light2.position.set(-50, -50, -50)
+    // scene.add(light2)
+
+    //渲染器根据场景、透视镜头来渲染画面，并将该画面内容填充到 DOM 的 canvas 元素中
+    const render = (time) => {
+      const sceneBackground = scene.background
+
+      //渲染 左侧 镜头
+      const leftAspect = setScissorForElement(leftViewRef) //返回的是宽高比
+
+      leftCamera.aspect = leftAspect
+      leftCamera.updateProjectionMatrix()
+
+      helper.update()
+      helper.visible = false
+
+      sceneBackground.set(0x000000)
+      renderer.render(scene, leftCamera)
+
+      //渲染 右侧 个镜头
+      const rightAspect = setScissorForElement(rightViewRef)
+
+      rightCamera.aspect = rightAspect
+      rightCamera.updateProjectionMatrix()
+
+      helper.visible = true
+
+      sceneBackground.set(0x000040)
+      renderer.render(scene, rightCamera)
+      window.requestAnimationFrame(render)
+    }
+    window.requestAnimationFrame(render)
+    // 监听窗口尺寸的改变，重新修改渲染器
+    function handlerResize() {
+      // camera.aspect = canvas.clientWidth / canvas.clientHeight //设置镜头宽高比
+      // leftCamera.updateProjectionMatrix() //通知镜头更新视野
+      rightCamera.updateProjectionMatrix() //通知镜头更新视野
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
+    }
+    handlerResize()
+    // window.addEventListener('resize', handlerResize)
+    //改为使用ResizeObserver来监控尺寸变化
+    // ResizeObserver用来监听对象的尺寸变化
+    const resizeObserver = new ResizeObserver(handlerResize, { box: 'border-box' })
+    resizeObserver.observe(canvas)
+    function setScissorForElement(div) {
+      if (container === null) {
+        return
+      }
+
+      //获得 canvas 和 div 的矩形框尺寸和位置
+      const canvasRect = container.getBoundingClientRect()
+      const divRect = div.getBoundingClientRect()
+
+      //计算出裁切框的尺寸和位置
+      const right = Math.min(divRect.right, canvasRect.right) - canvasRect.left
+      const left = Math.max(0, divRect.left - canvasRect.left)
+      const bottom = Math.min(divRect.bottom, canvasRect.bottom) - canvasRect.top
+      const top = Math.max(0, divRect.top - canvasRect.top)
+      const width = Math.min(canvasRect.width, right - left)
+      const height = Math.min(canvasRect.height, bottom - top)
+
+      //将剪刀设置为仅渲染到画布的该部分
+      const positiveYUpBottom = canvasRect.height - bottom
+      renderer.setScissor(left, positiveYUpBottom, width, height)
+      renderer.setViewport(left, positiveYUpBottom, width, height)
+
+      //返回外观
+      return width / height
+    }
+  </script>
+</html>

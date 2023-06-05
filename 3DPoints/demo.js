@@ -1,3 +1,4 @@
+const container = document.querySelector('.wrapper')
 class ThreeDemo {
   constructor(cvs) {
     this.container = cvs || document.body
@@ -8,10 +9,13 @@ class ThreeDemo {
     this.glist = []
     // 点阵模型索引
     this.objIndex = -1
+    this._isUserInteracting = false //移动端用户触摸屏幕
+    this._onPointerDownPointerX = 0 //触屏的位置x
+    this._onPointerDownPointerY = 0 //触屏的位置y
 
     // 场景
     this.createScene()
-    this.createLights()
+    // this.createLights()
     this.initGeometry()
     this.initTexture()
     this.initPartices()
@@ -88,8 +92,8 @@ class ThreeDemo {
     this.scene.add(this.ambientLight)
   }
   initGeometry() {
-    this.geometry = new THREE.Geometry()
-    this.around = new THREE.Geometry()
+    this.geometry = new THREE.BoxGeometry()
+    this.around = new THREE.BoxGeometry()
   }
   // 初始化贴图
   initTexture() {
@@ -148,6 +152,7 @@ class ThreeDemo {
     // })
 
     // material.vertexColors = THREE.VertexColors
+    // 点模型
     this.particles = new THREE.Points(this.geometry, material)
     this.scene.add(this.particles)
     this.particles.scale.set(1, 1, 1)
@@ -272,11 +277,25 @@ class ThreeDemo {
   }
   // 事件监听
   initEvent() {
+    const flag = navigator.userAgent.match(
+      /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+    )
+    if (flag) {
+      // 移动端
+      this.camera.position.z = 900
+    } else {
+      this.camera.position.z = 500
+      // PC端
+    }
     document.addEventListener('mousedown', this.onDocumentMouseDown.bind(this), false)
     document.addEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     document.addEventListener('mouseup', this.onDocumentMouseUp.bind(this), false)
     document.addEventListener('mouseout', this.onDocumentMouseOut.bind(this), false)
     document.addEventListener('mousewheel', this.onDocumentMouseWheel.bind(this), false)
+    // 移动端监听
+    document.addEventListener('touchstart', this.onDocumentTouchStart.bind(this), false)
+    document.addEventListener('touchmove', this.onDocumentTouchMove.bind(this), false)
+    document.addEventListener('touchend', this.onDocumentTouchEnd.bind(this), false)
     // document.addEventListener('keydown', this.onDocumentKeyDown.bind(this), false)
     // window.addEventListener('resize', this.onWindowResize, false)
     this.moveFunc = this.throttle(this.tweenMouseMove, 100)
@@ -336,6 +355,29 @@ class ThreeDemo {
       this.tweenObj(this.objIndex)
       this.flag = true
     }
+  }
+  onDocumentTouchStart(event) {
+    // event.preventDefault()
+    this._isUserInteracting = true
+    this._onPointerDownPointerX = event.touches[0].clientX
+    this._onPointerDownPointerY = event.touches[0].clientY
+    this.timeoutEvent = setTimeout(() => {
+      // 长按屏幕action
+      this.timeoutEvent = 0
+    }, 500)
+  }
+  onDocumentTouchMove(event) {
+    clearTimeout(this.timeoutEvent)
+  }
+  onDocumentTouchEnd(event) {
+    clearTimeout(this.timeoutEvent)
+    if (this.timeoutEvent !== 0) {
+      this._onPointerDownPointerY = this._onPointerDownPointerY - event.changedTouches[0].clientY
+      this._onPointerDownPointerY = this._onPointerDownPointerY > 15 ? this._onPointerDownPointerY : -1
+      this.wheelFunc(this._onPointerDownPointerY)
+      return
+    }
+    console.log('end ===>', event)
   }
   onWindowResize() {
     this.windowHalfX = window.innerWidth / 2
@@ -477,6 +519,7 @@ class ThreeDemo {
       this.objIndex--
       this.tweenObj(this.objIndex)
     }
+    container.style.transform = `translateY(-${100 * this.objIndex}%)`
   }
 }
 ;(function onLoad() {
